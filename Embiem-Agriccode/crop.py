@@ -45,8 +45,8 @@ CROPS = {
     "Rice":      {"ph_range": (5.5, 6.5), "season": "Rainy Season", "yield": "5-7 tons/ha",   "emoji": "🍚"},
     "Maize":     {"ph_range": (5.8, 7.0), "season": "Rainy Season", "yield": "4-6 tons/ha",   "emoji": "🌽"},
     "Groundnut": {"ph_range": (5.9, 7.0), "season": "Dry Season",   "yield": "2-3 tons/ha",   "emoji": "🥜"},
-    "Cocoa":     {"ph_range": (5.0, 6.5), "season": "Rainy Season", "yield": "1-2 tons/ha",   "emoji": "🍫"},
-    "Plantain":  {"ph_range": (5.5, 7.0), "season": "Rainy Season", "yield": "15-20 tons/ha", "emoji": "🍌"},
+    "Cocoa":     {"ph_range": (5.0, 6.5), "season": "Rainy Season", "yield": "1-2 tons/ha",   "emoji": ""},
+    "Plantain":  {"ph_range": (5.5, 7.0), "season": "Rainy Season", "yield": "15-20 tons/ha", "emoji": ""},
     "Tomato":    {"ph_range": (6.0, 7.0), "season": "Dry Season",   "yield": "20-30 tons/ha", "emoji": "🍅"},
     "Sorghum":   {"ph_range": (5.5, 7.5), "season": "Dry Season",   "yield": "2-3 tons/ha",   "emoji": "🌾"},
     "Cowpea":    {"ph_range": (6.0, 7.0), "season": "Rainy Season", "yield": "1-2 tons/ha",   "emoji": "🫘"},
@@ -60,11 +60,11 @@ LOCATION_TIPS = {
     "Niger":              "🌱 Moderate rainfall. Groundnut and maize do well.",
     "Oyo":                "🌴 Tropical climate. All crops can thrive here.",
     "Osun":               "✨ Good soil quality. High-value crops recommended.",
-    "Rivers":             "💧 High rainfall. Watch drainage. Root crops excel.",
+    "Rivers":             " 🌧️High rainfall. Watch drainage. Root crops excel.",
     "Jigawa":             "🏜️ Semi-arid. Millet, sorghum, and groundnut thrive. Use irrigation wisely.",
-    "Dutse (FUD Farm Zone)": "🎓 Sandy loam soils. Organic mulching highly recommended. Perfect for student research!",
+    "Dutse (FUD Farm Zone)": " Sandy loam soils. Organic mulching highly recommended. Perfect for student research!",
     "Hadejia":            "🌾 Excellent wetland/fadama areas. Perfect for dry-season irrigated rice.",
-    "Kano":               "🏪 High market access. Focus on early-maturing varieties.",
+    "Kano":               " High market access. Focus on early-maturing varieties.",
     "Katsina":            "🌵 Semi-arid zone. Focus on drought-resistant cereals like millet."
 }
 
@@ -82,7 +82,7 @@ if st.session_state.page == "input":
     # ── Farm Image ── (fixed path for both local and cloud)
     img_path = Path(__file__).parent / "IMG_20260522_111712.jpg"
     if img_path.exists():
-        st.image(str(img_path), width=700, caption="Data-Driven Yields for African Farmers")
+        st.image(str(img_path), use_container_width=True, caption="Data-Driven Yields for African Farmers")
     else:
         st.info("🌾 Crop Predator — Precision Agriculture for Nigerian Farmers")
 
