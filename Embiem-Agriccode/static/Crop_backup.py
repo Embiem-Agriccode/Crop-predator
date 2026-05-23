@@ -262,4 +262,3 @@ if st.session_state.page != "loading":
     i have 2 things to ask u, 1. is this code we made an app or 
     a webapp or a website? 2. can u give me the steps we took to 
     deployin so i will remember them for future reference?
-        
