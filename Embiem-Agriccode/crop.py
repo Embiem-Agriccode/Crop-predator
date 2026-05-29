@@ -175,6 +175,70 @@ if st.session_state.page == "input":
         st.session_state.page = "loading"
         st.rerun()
 
+
+# Add this to your INPUT page in crop.py
+
+st.divider()
+st.markdown("### 📂 Batch Farm Analysis")
+st.write("Upload a CSV file with multiple farms to analyse them all at once!")
+
+uploaded_file = st.file_uploader("Upload farms.csv", type=["csv"])
+
+if uploaded_file is not None:
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    # Read the file
+    df = pd.read_csv(uploaded_file)
+    st.success(f"✅ {len(df)} farms loaded!")
+    st.dataframe(df)
+    st.divider()
+
+    # Add pH Status column
+    df["pH_Status"] = df["pH"].apply(
+        lambda x: "Good" if 5.5 <= x <= 7.5 else "Bad"
+    )
+
+    # Stats
+    st.markdown("### 📊 Analysis Results")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Farms", len(df))
+    with col2:
+        st.metric("Good pH Farms", len(df[df["pH_Status"] == "Good"]))
+    with col3:
+        st.metric("Bad pH Farms", len(df[df["pH_Status"] == "Bad"]))
+
+    # Average pH
+    st.metric("Average Soil pH", f"{df['pH'].mean():.2f}")
+
+    # Season breakdown
+    st.markdown("### 🌦️ Farms by Season")
+    st.dataframe(df["Season"].value_counts())
+
+    # Chart
+    st.markdown("### 📈 Soil pH Chart")
+    fig, ax = plt.subplots()
+    ax.bar(df["Farm"], df["pH"], color="green")
+    ax.axhline(y=5.5, color="red", linestyle="--", label="Min pH (5.5)")
+    ax.axhline(y=7.5, color="orange", linestyle="--", label="Max pH (7.5)")
+    ax.set_xlabel("Farm")
+    ax.set_ylabel("pH Level")
+    ax.set_title("Soil pH by Farm")
+    plt.xticks(rotation=90, fontsize=7)
+    plt.tight_layout()
+    ax.legend()
+    st.pyplot(fig)
+
+    # Download results
+    csv = df.to_csv(index=False)
+    st.download_button(
+        label="📥 Download Results",
+        data=csv,
+        file_name="batch_results.csv",
+        mime="text/csv",
+        use_container_width=True
+    )
 # ==========================================
 # PAGE 2: LOADING
 # ==========================================
@@ -479,4 +543,4 @@ if st.session_state.page != "loading":
 **Developed by:** Mubarak Haruna | Level 2 Crop Science, FUD  
 **Purpose:** Data-Driven Agriculture for Nigerian Farmers  
 **Location:** Federal University of Dutse (FUD)
-""")
+""") 

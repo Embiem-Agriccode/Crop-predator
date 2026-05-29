@@ -1,0 +1,5 @@
+Farm,Location,pH,Size,Season,Revenue,pH_status
+Farm A,Dutse,6.5,3,Rainy Season,650000.0,Good
+Farm B,Kano,7.2,5,Dry Season,720000.0,Good
+Farm C,Jigawa,5.8,2,Rainy Season,580000.0,Good
+Farm D,Hadejia,6.0,8,Dry Season,600000.0,Good
