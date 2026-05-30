@@ -551,6 +551,7 @@ if st.session_state.page != "loading":
     st.divider()
     st.markdown("""
 **Developed by:** Mubarak Haruna | Level 2 Crop Science, FUD  
-**Purpose:** Data-Driven Agriculture for Nigerian Farmers  
+**Purpose:** Data-Driven A
+griculture for Nigerian Farmers  
 **Location:** Federal University of Dutse (FUD)
 """)
