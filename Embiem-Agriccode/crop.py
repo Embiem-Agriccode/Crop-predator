@@ -2,6 +2,8 @@ import streamlit as st
 import time
 from pathlib import Path
 from datetime import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
 
 # ==========================================
 # CROP PREDATOR - FUD CROP SCIENCE PROJECT
@@ -43,10 +45,9 @@ if "analysis_data" not in st.session_state:
     st.session_state.analysis_data = {}
 
 # ==========================================
-# CROP DATABASE (22 crops)
+# CROP DATABASE (23 crops)
 # ==========================================
 CROPS = {
-    # Original crops
     "Cassava":      {"ph_range": (5.5, 6.5), "season": "Rainy Season", "yield": "12-15 tons/ha", "price_per_ton": 80000},
     "Yam":          {"ph_range": (5.5, 6.0), "season": "Rainy Season", "yield": "8-12 tons/ha",  "price_per_ton": 150000},
     "Rice":         {"ph_range": (5.5, 6.5), "season": "Rainy Season", "yield": "5-7 tons/ha",   "price_per_ton": 400000},
@@ -57,7 +58,6 @@ CROPS = {
     "Tomato":       {"ph_range": (6.0, 7.0), "season": "Dry Season",   "yield": "20-30 tons/ha", "price_per_ton": 100000},
     "Sorghum":      {"ph_range": (5.5, 7.5), "season": "Dry Season",   "yield": "2-3 tons/ha",   "price_per_ton": 100000},
     "Cowpea":       {"ph_range": (6.0, 7.0), "season": "Rainy Season", "yield": "1-2 tons/ha",   "price_per_ton": 450000},
-    # New Jigawa/Northern crops
     "Millet":       {"ph_range": (5.5, 7.0), "season": "Rainy Season", "yield": "1-2 tons/ha",   "price_per_ton": 200000},
     "Wheat":        {"ph_range": (6.0, 7.5), "season": "Dry Season",   "yield": "3-5 tons/ha",   "price_per_ton": 450000},
     "Sesame":       {"ph_range": (5.5, 7.0), "season": "Rainy Season", "yield": "1-2 tons/ha",   "price_per_ton": 600000},
@@ -175,70 +175,66 @@ if st.session_state.page == "input":
         st.session_state.page = "loading"
         st.rerun()
 
-
-# Add this to your INPUT page in crop.py
-
-st.divider()
-st.markdown("### 📂 Batch Farm Analysis")
-st.write("Upload a CSV file with multiple farms to analyse them all at once!")
-
-uploaded_file = st.file_uploader("Upload farms.csv", type=["csv"])
-
-if uploaded_file is not None:
-    import pandas as pd
-    import matplotlib.pyplot as plt
-
-    # Read the file
-    df = pd.read_csv(uploaded_file)
-    st.success(f"✅ {len(df)} farms loaded!")
-    st.dataframe(df)
+    # ==========================================
+    # BATCH UPLOAD — stays on input page only
+    # ==========================================
     st.divider()
+    st.markdown("### 📂 Batch Farm Analysis")
+    st.write("Upload a CSV file with multiple farms to analyse them all at once!")
 
-    # Add pH Status column
-    df["pH_Status"] = df["pH"].apply(
-        lambda x: "Good" if 5.5 <= x <= 7.5 else "Bad"
-    )
+    uploaded_file = st.file_uploader("Upload farms.csv", type=["csv"])
 
-    # Stats
-    st.markdown("### 📊 Analysis Results")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Total Farms", len(df))
-    with col2:
-        st.metric("Good pH Farms", len(df[df["pH_Status"] == "Good"]))
-    with col3:
-        st.metric("Bad pH Farms", len(df[df["pH_Status"] == "Bad"]))
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+        st.success(f"✅ {len(df)} farms loaded!")
+        st.dataframe(df)
+        st.divider()
 
-    # Average pH
-    st.metric("Average Soil pH", f"{df['pH'].mean():.2f}")
+        # Add pH Status column
+        df["pH_Status"] = df["pH"].apply(
+            lambda x: "Good" if 5.5 <= x <= 7.5 else "Bad"
+        )
 
-    # Season breakdown
-    st.markdown("### 🌦️ Farms by Season")
-    st.dataframe(df["Season"].value_counts())
+        # Stats
+        st.markdown("### 📊 Analysis Results")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Total Farms", len(df))
+        with col2:
+            st.metric("Good pH Farms", len(df[df["pH_Status"] == "Good"]))
+        with col3:
+            st.metric("Bad pH Farms", len(df[df["pH_Status"] == "Bad"]))
 
-    # Chart
-    st.markdown("### 📈 Soil pH Chart")
-    fig, ax = plt.subplots()
-    ax.bar(df["Farm"], df["pH"], color="green")
-    ax.axhline(y=5.5, color="red", linestyle="--", label="Min pH (5.5)")
-    ax.axhline(y=7.5, color="orange", linestyle="--", label="Max pH (7.5)")
-    ax.set_xlabel("Farm")
-    ax.set_ylabel("pH Level")
-    ax.set_title("Soil pH by Farm")
-    plt.xticks(rotation=90, fontsize=7)
-    plt.tight_layout()
-    ax.legend()
-    st.pyplot(fig)
+        st.metric("Average Soil pH", f"{df['pH'].mean():.2f}")
 
-    # Download results
-    csv = df.to_csv(index=False)
-    st.download_button(
-        label="📥 Download Results",
-        data=csv,
-        file_name="batch_results.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
+        # Season breakdown
+        st.markdown("### Farms by Season")
+        st.dataframe(df["Season"].value_counts())
+
+        # Chart
+        st.markdown("### Soil pH Chart")
+        fig, ax = plt.subplots()
+        ax.bar(df["Farm"], df["pH"], color="green")
+        ax.axhline(y=5.5, color="red", linestyle="--", label="Min pH (5.5)")
+        ax.axhline(y=7.5, color="orange", linestyle="--", label="Max pH (7.5)")
+        ax.set_xlabel("Farm")
+        ax.set_ylabel("pH Level")
+        ax.set_title("Soil pH by Farm")
+        plt.xticks(rotation=90, fontsize=7)
+        plt.tight_layout()
+        ax.legend()
+        st.pyplot(fig)
+
+        # Download results
+        csv = df.to_csv(index=False)
+        st.download_button(
+            label="📥 Download Results",
+            data=csv,
+            file_name="batch_results.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+
 # ==========================================
 # PAGE 2: LOADING
 # ==========================================
@@ -297,6 +293,7 @@ elif st.session_state.page == "results":
     ]
 
     st.markdown("### Best Crops for Your Farm")
+    best_crops_sorted = []
     if best_crops:
         best_crops_sorted = sorted(
             best_crops,
@@ -315,19 +312,40 @@ elif st.session_state.page == "results":
                 st.write(f"pH: {info['ph_range'][0]}-{info['ph_range'][1]}")
     else:
         st.warning("No ideal crops for this pH in current season.")
-        best_crops_sorted = []
+    st.divider()
+
+    # Success Rate
+    st.markdown("### 🎯 Crop Success Rate")
+    if best_crops_sorted:
+        top_crop, top_info = best_crops_sorted[0]
+        ph_min = top_info["ph_range"][0]
+        ph_max = top_info["ph_range"][1]
+        ph_middle = (ph_min + ph_max) / 2
+        ph_range_size = ph_max - ph_min
+        distance = abs(ph - ph_middle)
+        success_rate = max(0, 100 - (distance / ph_range_size * 100))
+
+        st.progress(int(success_rate))
+        if success_rate >= 80:
+            st.success(f"✅ {success_rate:.0f}% — Excellent conditions for {top_crop}!")
+        elif success_rate >= 60:
+            st.warning(f"⚠️ {success_rate:.0f}% — Good conditions for {top_crop}.")
+        else:
+            st.error(f"❌ {success_rate:.0f}% — Poor conditions. Consider soil amendment first.")
+    else:
+        st.warning("No crops matched — fix soil pH first.")
     st.divider()
 
     # Soil Amendment
     st.markdown("### Soil Amendment Recommendations")
     if ph < 5.5:
-        amendment_text = f"Apply Agricultural Lime (CaCO3) — 2-3 tons/ha. Wait 2-4 weeks before planting."
+        amendment_text = "Apply Agricultural Lime (CaCO3) — 2-3 tons/ha. Wait 2-4 weeks before planting."
         st.error(f"Highly Acidic Soil (pH {ph:.1f})")
         st.write("**Solution:** Apply Agricultural Lime (CaCO3)")
         st.write("**Dosage:** 2-3 tons/hectare")
         st.write("**Timeline:** Wait 2-4 weeks before planting")
     elif ph > 7.5:
-        amendment_text = f"Apply Elemental Sulfur — 1-2 tons/ha. Takes 3-6 months for effect."
+        amendment_text = "Apply Elemental Sulfur — 1-2 tons/ha. Takes 3-6 months for effect."
         st.error(f"Alkaline Soil (pH {ph:.1f})")
         st.write("**Solution:** Apply Elemental Sulfur")
         st.write("**Dosage:** 1-2 tons/hectare")
@@ -375,7 +393,6 @@ elif st.session_state.page == "results":
     st.markdown("### Farm Profitability Calculator")
     if best_crops_sorted:
         top_crop, top_info = best_crops_sorted[0]
-
         col1, col2 = st.columns(2)
         with col1:
             seed_cost = st.number_input("Seed Cost (per hectare)", min_value=0, value=15000, step=1000)
@@ -421,7 +438,6 @@ elif st.session_state.page == "results":
             else:
                 st.error("Not profitable at current prices. Choose another crop.")
 
-            # Store profit data for report
             st.session_state.analysis_data["profit_data"] = {
                 "crop": top_crop, "total_yield": total_yield,
                 "gross_revenue": gross_revenue, "total_cost": total_cost,
@@ -476,19 +492,13 @@ SOIL PROFILE ({location})
             report += f"Challenge     : {profile['challenge']}\n"
             report += f"Expert Tip    : {profile['tip']}\n"
 
-        report += f"""
-RECOMMENDED CROPS
------------------
-"""
+        report += "\nRECOMMENDED CROPS\n-----------------\n"
         for idx, (crop, info) in enumerate(best_crops_sorted, 1):
             report += f"{idx}. {crop}\n"
             report += f"   Yield Potential : {info['yield']}\n"
             report += f"   Suitable pH     : {info['ph_range'][0]} - {info['ph_range'][1]}\n\n"
 
-        report += f"""
-FERTILIZER PLAN — {top_crop}
-----------------------------------------------
-"""
+        report += f"\nFERTILIZER PLAN — {top_crop}\n----------------------------------------------\n"
         if fert:
             if ph < top_info["ph_range"][0]:
                 report += fert.get("acidic", "")
@@ -543,4 +553,4 @@ if st.session_state.page != "loading":
 **Developed by:** Mubarak Haruna | Level 2 Crop Science, FUD  
 **Purpose:** Data-Driven Agriculture for Nigerian Farmers  
 **Location:** Federal University of Dutse (FUD)
-""") 
+""")
