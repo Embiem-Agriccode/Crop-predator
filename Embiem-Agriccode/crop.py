@@ -191,10 +191,24 @@ if st.session_state.page == "input":
         st.divider()
 
         # Add pH Status column
-        df["pH_Status"] = df["pH"].apply(
+        
+        ph_column = None
+        for col in df.columns :
+            if "ph"  in col.lower ():
+                ph_column = col
+                break
+        name_column = None
+        for col in df.columns:
+            if "farm" in col.lower() or "name" in col.lower():
+                name_column = col
+                break
+        if ph_column is None:
+            st.error("No pH column found! Make sure your CSV has a pH column.")
+        else:
+            st.success(f"pH column detected: {ph_column}")
+        df["pH_Status"] = df[ph_column].apply(
             lambda x: "Good" if 5.5 <= x <= 7.5 else "Bad"
         )
-
         # Stats
         st.markdown("### 📊 Analysis Results")
         col1, col2, col3 = st.columns(3)
@@ -205,7 +219,7 @@ if st.session_state.page == "input":
         with col3:
             st.metric("Bad pH Farms", len(df[df["pH_Status"] == "Bad"]))
 
-        st.metric("Average Soil pH", f"{df['pH'].mean():.2f}")
+        st.metric("Average Soil pH", f"{df[ph_column].mean():.2f}")
 
         # Season breakdown
         st.markdown("### Farms by Season")
@@ -214,7 +228,7 @@ if st.session_state.page == "input":
         # Chart
         st.markdown("### Soil pH Chart")
         fig, ax = plt.subplots()
-        ax.bar(df["Farm"], df["pH"], color="green")
+        ax.scattered(df[name_column], df[ph_column], color="green")
         ax.axhline(y=5.5, color="red", linestyle="--", label="Min pH (5.5)")
         ax.axhline(y=7.5, color="orange", linestyle="--", label="Max pH (7.5)")
         ax.set_xlabel("Farm")
