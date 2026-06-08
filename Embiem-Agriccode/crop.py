@@ -143,7 +143,7 @@ LOCATION_TIPS = {
 if st.session_state.page == "input":
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown("# 🌱 Crop Predator")
+        st.markdown("## 🌱 Crop Predator")
         st.markdown("<h3 style='text-align:center;'>Precision Agriculture Tool</h3>", unsafe_allow_html=True)
         st.markdown("<p style='text-align:center;'><i>by Mubarak Haruna | FUD Crop Science</i></p>", unsafe_allow_html=True)
 
@@ -228,7 +228,7 @@ if st.session_state.page == "input":
         # Chart
         st.markdown("### Soil pH Chart")
         fig, ax = plt.subplots()
-        ax.scattered(df[name_column], df[ph_column], color="green")
+        ax.bar(df[name_column], df[ph_column], color="green")
         ax.axhline(y=5.5, color="red", linestyle="--", label="Min pH (5.5)")
         ax.axhline(y=7.5, color="orange", linestyle="--", label="Max pH (7.5)")
         ax.set_xlabel("Farm")
