@@ -136,7 +136,21 @@ LOCATION_TIPS = {
     "Kano":                  "High market access. Focus on early-maturing varieties.",
     "Katsina":               "Semi-arid zone. Focus on drought-resistant cereals like millet."
 }
-
+LOCATION_CROPS = {
+    "Dutse (FUD Farm Zone)": ["Millet", "Sorghum", "Cowpea", "Groundnut", "Sesame", "Maize", "Cotton"],
+    "Hadejia":               ["Rice", "Wheat", "Onion", "Tomato", "Pepper", "Cowpea"],
+    "Kano":                  ["Onion", "Tomato", "Pepper", "Maize", "Sorghum", "Groundnut", "Wheat"],
+    "Katsina":               ["Millet", "Sorghum", "Groundnut", "Cowpea", "Sesame"],
+    "Jigawa":                ["Millet", "Sorghum", "Cowpea", "Groundnut", "Sesame", "Cotton"],
+    "Kaduna":                ["Maize", "Sorghum", "Rice", "Soybean", "Cowpea", "Groundnut"],
+    "Borno":                 ["Sorghum", "Millet", "Cowpea", "Sesame", "Cotton"],
+    "Niger":                 ["Maize", "Cassava", "Yam", "Rice", "Groundnut", "Sorghum"],
+    "Lagos":                 ["Cassava", "Plantain", "Maize", "Okra", "Watermelon"],
+    "Ogun":                  ["Cassava", "Yam", "Plantain", "Maize", "Cocoa"],
+    "Oyo":                   ["Cocoa", "Plantain", "Cassava", "Yam", "Maize"],
+    "Osun":                  ["Cocoa", "Plantain", "Cassava", "Yam", "Okra"],
+    "Rivers":                ["Cassava", "Plantain", "Sweet Potato", "Okra", "Watermelon"],
+}
 # ==========================================
 # PAGE 1: INPUT
 # ==========================================
@@ -199,7 +213,7 @@ if st.session_state.page == "input":
                 break
         name_column = None
         for col in df.columns:
-            if "farm" in col.lower() or "name" in col.lower():
+           if col.lower() == "farm_name" or ("name" in col.lower() and "farm" in col.lower()):
                 name_column = col
                 break
         if ph_column is None:
@@ -226,18 +240,23 @@ if st.session_state.page == "input":
         st.dataframe(df["Season"].value_counts())
 
         # Chart
+        # Chart
+        import plotly.express as px
+
         st.markdown("### Soil pH Chart")
-        fig, ax = plt.subplots()
-        ax.bar(df[name_column], df[ph_column], color="green")
-        ax.axhline(y=5.5, color="red", linestyle="--", label="Min pH (5.5)")
-        ax.axhline(y=7.5, color="orange", linestyle="--", label="Max pH (7.5)")
-        ax.set_xlabel("Farm")
-        ax.set_ylabel("pH Level")
-        ax.set_title("Soil pH by Farm")
-        plt.xticks(rotation=90, fontsize=7)
-        plt.tight_layout()
-        ax.legend()
-        st.pyplot(fig)
+        fig = px.bar(
+            df,
+            x=name_column,
+            y=ph_column,
+            color=ph_column,
+            color_continuous_scale=["red", "green", "orange"],
+            range_color=[4.0, 9.0],
+            labels={ph_column: "Soil pH", name_column: "Farm"},
+            title="Soil pH by Farm"
+)
+        fig.add_hline(y=5.5, line_dash="dash", line_color="red", annotation_text="Min pH (5.5)")
+        fig.add_hline(y=7.5, line_dash="dash", line_color="orange", annotation_text="Max pH (7.5)")
+        st.plotly_chart(fig, use_container_width=True)
 
         # Download results
         csv = df.to_csv(index=False)
@@ -299,12 +318,16 @@ elif st.session_state.page == "results":
         st.metric("Farm Size", f"{farm_size} ha")
     st.divider()
 
-    # Best Crops
+    allowed_crops = LOCATION_CROPS.get(location, list(CROPS.keys()))
+
+    allowed_crops = LOCATION_CROPS.get(location, list(CROPS.keys()))
+
     best_crops = [
         (crop, info) for crop, info in CROPS.items()
-        if info["ph_range"][0] <= ph <= info["ph_range"][1]
+        if crop in allowed_crops
+        and info["ph_range"][0] <= ph <= info["ph_range"][1]
         and info["season"] == season
-    ]
+]
 
     st.markdown("### Best Crops for Your Farm")
     best_crops_sorted = []
