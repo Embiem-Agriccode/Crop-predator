@@ -223,7 +223,7 @@ if st.session_state.page == "input":
         df["pH_Status"] = df[ph_column].apply(
             lambda x: "Good" if 5.5 <= x <= 7.5 else "Bad"
         )
-        # Stats
+        # Sta
         st.markdown("### 📊 Analysis Results")
         col1, col2, col3 = st.columns(3)
         with col1:
