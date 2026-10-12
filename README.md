@@ -4,7 +4,7 @@
 
 SoilIQ is a Streamlit web app that helps farmers, extension workers, and agric students estimate fertilizer needs and expected returns for common Nigerian crops, based on soil profile and farm size.
 
-🔗 **Live app:** `<add Streamlit Cloud link>`
+🔗 **Live app:** `https://crop-predator.streamlit.app/`
 📦 **Repo:** [github.com/Embiem-Agriccode/Crop-predator](https://github.com/Embiem-Agriccode/Crop-predator)
 
 ---
